@@ -7,8 +7,11 @@ import streamlit as st
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.metrics import accuracy_score, f1_score, mean_squared_error, r2_score
-DEFAULT_DATA_URL = "https://raw.githubusercontent.com/tshewangla/bhutan-healthcare-ds-project/refs/heads/main/data/processed/life_expectancy_btn_clean.csv"
-st.set_page_config(page_title="Bhutan Healthcare Analytics", layout="wide")
+
+st.set_page_config(page_title="Bhutan Life Expectancy Analytics", layout="wide")
+
+# Path to default cleaned dataset (bundled with the repo)
+DEFAULT_DATA_PATH = "https://raw.githubusercontent.com/tshewangla/bhutan-healthcare-ds-project/refs/heads/main/data/processed/life_expectancy_btn_clean.csv"
 
 # -----------------------
 # Helpers for session state
@@ -37,22 +40,24 @@ page = st.sidebar.radio(
 # Page: Overview
 # -----------------------
 if page == "Overview":
-    st.title("Bhutan Healthcare Data Science Project")
+    st.title("Bhutan Life Expectancy Analysis & Prediction")
 
     st.markdown(
         """
-        This app is a **starter project** for analysing healthcare data from Bhutan
-        and building simple prediction models.
+        This Streamlit app is part of a data science project analysing
+        **life expectancy in Bhutan (2000–2021)** using WHO data.
 
-        **What you can do:**
-        1. Upload a healthcare CSV dataset (e.g. from WHO/HDX for Bhutan).
-        2. Automatically perform basic cleaning (duplicates + missing values).
-        3. Explore the data (summary stats, missing values, correlations).
-        4. Train a machine learning model (classification or regression).
-        5. Use the model to make predictions from user input.
+        ### What you can do in this app:
+        1. Load a built-in cleaned dataset (Bhutan life expectancy).
+        2. Or upload your own healthcare CSV file.
+        3. Perform basic automatic cleaning (duplicates + missing values).
+        4. Explore the dataset (summary statistics, correlations).
+        5. Train a machine learning model (regression or classification).
+        6. Make predictions from user inputs.
 
-        The idea is that you customise this app with *your own* dataset,
-        explanations and visualisations for your assignment/report.
+        For the assignment, the main focus dataset is
+        **Life expectancy at birth (years)** for Bhutan, but the app can
+        also work with other tabular health datasets.
         """
     )
 
@@ -60,12 +65,31 @@ if page == "Overview":
 # Page: Upload & Clean Data
 # -----------------------
 elif page == "Upload & Clean Data":
-    st.title("1. Upload & Clean Healthcare Dataset")
+    st.title("1. Upload & Clean Dataset")
 
     uploaded_file = st.file_uploader(
-        "Upload a CSV file (health indicators, disease prevalence, hospital data, etc.)",
+        "Upload a CSV file (e.g. WHO indicators, health metrics, etc.)",
         type=["csv"]
     )
+
+    st.write("Alternatively, use the default Bhutan life expectancy dataset:")
+
+    if st.button("Load default Bhutan Life Expectancy Data"):
+        if os.path.exists(DEFAULT_DATA_PATH):
+            df_default = pd.read_csv(DEFAULT_DATA_PATH)
+            st.session_state.df = df_default
+            st.success("Loaded default Bhutan life expectancy dataset from project files.")
+            st.write("### Default Dataset Preview")
+            st.write(df_default.head())
+            st.info(
+                "You can now go to **EDA**, **Train Model**, or **Predict** "
+                "using the default dataset."
+            )
+        else:
+            st.error(
+                f"Default dataset not found at `{DEFAULT_DATA_PATH}`. "
+                "Please make sure the file exists in your repository."
+            )
 
     if uploaded_file is not None:
         df = pd.read_csv(uploaded_file)
@@ -103,7 +127,7 @@ elif page == "Upload & Clean Data":
         st.write("Any remaining missing values per column:")
         st.write(df_clean.isna().sum())
 
-        # save to session + disk (for assignment structure)
+        # Save to session + disk (for assignment structure)
         st.session_state.df = df_clean
 
         os.makedirs("data/processed", exist_ok=True)
@@ -116,7 +140,11 @@ elif page == "Upload & Clean Data":
             "then **Train Model**."
         )
     else:
-        st.info("Please upload a CSV file to get started.")
+        if st.session_state.df is None:
+            st.info(
+                "Upload a CSV file above or click the button to load the "
+                "default Bhutan life expectancy dataset."
+            )
 
 
 # -----------------------
@@ -142,7 +170,7 @@ elif page == "EDA":
         st.subheader("Column Types")
         st.write(df.dtypes)
 
-        # Simple correlation heatmap (numeric only)
+        # Simple correlation matrix (numeric only)
         num_cols = df.select_dtypes(include=[np.number]).columns.tolist()
         if len(num_cols) >= 2:
             st.subheader("Correlation Matrix (numerical features)")
@@ -258,7 +286,7 @@ elif page == "Predict":
     if df is None or model is None or feature_cols is None:
         st.warning(
             "No model or data found. "
-            "Please upload data and train a model first."
+            "Please upload/load data and train a model first."
         )
     else:
         st.write("Provide input values for the features below:")
@@ -268,9 +296,12 @@ elif page == "Predict":
         for col in feature_cols:
             if df[col].dtype == "object":
                 options = df[col].dropna().unique().tolist()
-                default_val = options[0] if options else ""
-                input_val = st.selectbox(col, options=options, index=0)
+                if not options:
+                    input_val = ""
+                else:
+                    input_val = st.selectbox(col, options=options)
             else:
+                # Use reasonable defaults based on data
                 min_val = float(df[col].min())
                 max_val = float(df[col].max())
                 mean_val = float(df[col].mean())
@@ -308,5 +339,6 @@ elif page == "Predict":
 
             st.info(
                 "For your report, you can explain what this prediction means in the "
-                "context of Bhutanese healthcare (e.g. predicted risk level, expected rate, etc.)."
+                "context of Bhutanese healthcare (e.g. predicted life expectancy or "
+                "other health indicator value)."
             )
