@@ -7,7 +7,7 @@ import streamlit as st
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.metrics import accuracy_score, f1_score, mean_squared_error, r2_score
-
+DEFAULT_DATA_URL = "https://raw.githubusercontent.com/tshewangla/bhutan-healthcare-ds-project/refs/heads/main/data/processed/life_expectancy_btn_clean.csv"
 st.set_page_config(page_title="Bhutan Healthcare Analytics", layout="wide")
 
 # -----------------------
