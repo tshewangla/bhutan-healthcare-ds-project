@@ -39,7 +39,7 @@ Yuden
 
 Tenzin
 
-👑 Tshewang Dorji — Team Leader & Primary Developer
+Tshewang Dorji — Team Leader & Primary Developer
 
 As the team leader, Tshewang coordinated the entire project and was responsible for the majority of the technical implementation.
 He handled:
