@@ -11,7 +11,7 @@ from sklearn.metrics import accuracy_score, f1_score, mean_squared_error, r2_sco
 st.set_page_config(page_title="Bhutan Life Expectancy Analytics", layout="wide")
 
 # Path to default cleaned dataset (bundled with the repo)
-DEFAULT_DATA_PATH = "https://raw.githubusercontent.com/tshewangla/bhutan-healthcare-ds-project/refs/heads/main/data/processed/life_expectancy_btn_clean.csv"
+DEFAULT_DATA_PATH = "data/processed/life_expectancy_btn_clean.csv"
 
 # -----------------------
 # Helpers for session state
