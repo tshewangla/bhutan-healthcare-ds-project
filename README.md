@@ -52,10 +52,6 @@ Cleaning and validating the final datasets
 
 Conducting detailed EDA and statistical summaries
 
-Performing feature engineering
-
-Developing and training the machine learning model
-
 Saving and documenting the final model
 
 Building and deploying the full Streamlit web application
