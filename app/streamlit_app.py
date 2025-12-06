@@ -336,12 +336,10 @@ elif page == "Train Model":
                     st.write(f"**Accuracy:** {acc:.3f}")
                     st.write(f"**F1-score (weighted):** {f1:.3f}")
                 else:
-                    rmse = mean_squared_error(
-                        y_test,
-                        y_pred,
-                        squared=False,
-                    )
+                    mse = mean_squared_error(y_test, y_pred)  
+                    rmse = mse ** 0.5                        
                     r2 = r2_score(y_test, y_pred)
+
                     st.write(f"**RMSE:** {rmse:.3f}")
                     st.write(f"**R²:** {r2:.3f}")
 
